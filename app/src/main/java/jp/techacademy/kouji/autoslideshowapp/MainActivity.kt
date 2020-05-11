@@ -88,6 +88,10 @@ class MainActivity : AppCompatActivity() {
                 imageView.setImageURI(imageUri)
             } else {
                 cursor!!.moveToFirst()
+                val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+                val id = cursor.getLong(fieldIndex)
+                val imageUri =
+                    ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
                 imageView.setImageURI(imageUri)
             }
 
@@ -101,8 +105,13 @@ class MainActivity : AppCompatActivity() {
                     ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
 
                 imageView.setImageURI(imageUri)
+
             } else {
                 cursor!!.moveToLast()
+                val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+                val id = cursor.getLong(fieldIndex)
+                val imageUri =
+                    ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
                 imageView.setImageURI(imageUri)
             }
 
