@@ -3,6 +3,8 @@ package jp.techacademy.kouji.autoslideshowapp
 import android.Manifest
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import java.util.*
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
@@ -16,6 +18,13 @@ import android.content.Intent
 class MainActivity : AppCompatActivity() {
 
     private val PERMISSIONS_REQUEST_CODE = 100
+
+    private var mTimer: Timer? = null
+
+    //タイマー用の時間のための変数
+    private var mTimerSec = 0.0
+
+    private var mHandler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +51,8 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
+
 
 
     override fun onRequestPermissionsResult(
@@ -117,6 +128,46 @@ class MainActivity : AppCompatActivity() {
 
 
         }
+
+        play_button.setOnClickListener {
+            next_button.isClickable = false
+            back_button.isClickable = false
+            play_button.text = "停止"
+            if (mTimer == null) {
+                mTimer = Timer()
+                mTimer!!.schedule(object : TimerTask() {
+                    override fun run() {
+                        mTimerSec += 2
+                        mHandler.post {
+                            if (cursor!!.moveToNext()) {
+                                val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+                                val id = cursor.getLong(fieldIndex)
+                                val imageUri =
+                                    ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+
+                                imageView.setImageURI(imageUri)
+                            } else {
+                                cursor!!.moveToFirst()
+                                val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+                                val id = cursor.getLong(fieldIndex)
+                                val imageUri =
+                                    ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+                                imageView.setImageURI(imageUri)
+                            }
+
+                        }
+                    }
+                }, 2000, 2000) //最初に始動させるまで、100ミリ秒、ループの間隔を100ミリ秒に設定
+            } else {
+                next_button.isClickable = true
+                back_button.isClickable = true
+                play_button.text = "再生"
+                mTimer!!.cancel()
+                mTimer = null
+            }
+        }
+
+
 
             //Log.d("ANDROID", "URI : " + imageUri.toString())
 
