@@ -68,11 +68,9 @@ class MainActivity : AppCompatActivity() {
             null // ソート (null ソートなし)
         )
 
-        //next_button.setOnClickListener {
-        if (cursor!!.moveToFirst()) {
 
-            do {
-            // indexからIDを取得し、そのIDから画像のURIを取得する
+        cursor!!.moveToFirst()
+        // indexからIDを取得し、そのIDから画像のURIを取得する
             val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
             val id = cursor.getLong(fieldIndex)
             val imageUri =
@@ -80,10 +78,41 @@ class MainActivity : AppCompatActivity() {
 
             imageView.setImageURI(imageUri)
 
-            Log.d("ANDROID", "URI : " + imageUri.toString())
+        next_button.setOnClickListener {
+            if (cursor!!.moveToNext()) {
+                val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+                val id = cursor.getLong(fieldIndex)
+                val imageUri =
+                    ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+
+                imageView.setImageURI(imageUri)
+            } else {
+                cursor!!.moveToFirst()
+                imageView.setImageURI(imageUri)
+            }
+
+        }
+
+        back_button.setOnClickListener {
+            if (cursor!!.moveToPrevious()) {
+                val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+                val id = cursor.getLong(fieldIndex)
+                val imageUri =
+                    ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+
+                imageView.setImageURI(imageUri)
+            } else {
+                cursor!!.moveToLast()
+                imageView.setImageURI(imageUri)
+            }
 
 
-            } while (cursor.moveToNext())
+        }
+
+            //Log.d("ANDROID", "URI : " + imageUri.toString())
+
+
+            //} while (cursor.moveToNext())
 
             //next_button.setOnClickListener {
                 //cursor.moveToNext()
@@ -100,7 +129,7 @@ class MainActivity : AppCompatActivity() {
             //}
 
         }
-    }
+
 
 
 
